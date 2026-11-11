@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Researcher Master - Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .panel { border: 1px solid #ddd; padding: 12px; margin-bottom: 12px; }
+    button { margin-right: 8px; }
+    pre { background:#f8f8f8; padding:8px; }
+  </style>
+</head>
+<body>
+  <h1>Researcher-Master Dashboard</h1>
+  <p>
+    Quick links: <a href="/static/chat.html" target="_blank">Chat / Agent</a> |
+    <a href="/static/kg.html" target="_blank">Knowledge Graph</a> |
+    <a href="/review" target="_blank">Review Queue</a>
+  </p>
+
+  <div class="panel">
+    <h3>Orchestrator</h3>
+    <button id="orch-start">Start Orchestrator</button>
+    <button id="orch-stop">Stop Orchestrator</button>
+  </div>
+
+  <div class="panel">
+    <h3>Worker (discovery)</h3>
+    <label>Interval seconds: <input id="worker-interval" value="5" style="width:60px"/></label>
+    <button id="worker-start">Start Worker</button>
+    <button id="worker-stop">Stop Worker</button>
+    <div id="discover-queue-status"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Autonomy</h3>
+    <input id="autonomy-goal" placeholder="Enter goal e.g. 'Master photosynthesis'" style="width:60%" />
+    <label>Interval <input id="autonomy-interval" value="120" style="width:80px"/></label>
+    <button id="autonomy-start">Start</button>
+    <button id="autonomy-stop">Stop</button>
+    <pre id="autonomy-status">Status: unknown</pre>
+  </div>
+
+  <div class="panel">
+    <h3>Index & Discovery</h3>
+    <button id="rebuild-index">Rebuild Index</button>
+    <button id="seed-discover">Seed Discover (Wikipedia fallback)</button>
+    <input id="seed-input" placeholder="Photosynthesis, Water boiling" style="width:40%" />
+    <div id="rebuild-result"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Recent runs & queues</h3>
+    <button id="refresh-logs">Refresh Logs</button>
+    <div id="logs" style="max-height:200px; overflow:auto;"></div>
+    <h4>Review Queue</h4>
+    <div id="review-queue" style="max-height:200px; overflow:auto;"></div>
+  </div>
+
+  <script>
+    async function postJson(url, body) {
+      const res = await fetch(url, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      return res.json().catch(()=>({}));
+    }
+
+    document.getElementById('orch-start').onclick = async () => {
+      const r = await postJson('/admin/orchestrator/start', {});
+      alert(JSON.stringify(r));
+    };
+    document.getElementById('orch-stop').onclick = async () => {
+      const r = await postJson('/admin/orchestrator/stop', {});
+      alert(JSON.stringify(r));
+    };
+
+    document.getElementById('worker-start').onclick = async () => {
+      const interval = parseInt(document.getElementById('worker-interval').value || '5');
+      const r = await postJson('/admin/worker/start', {name:'discovery_worker', interval});
+      alert(JSON.stringify(r));
+    };
+    document.getElementById('worker-stop').onclick = async () => {
+      const r = await postJson('/admin/worker/stop', {name:'discovery_worker'});
+      alert(JSON.stringify(r));
+    };
+
+    document.getElementById('autonomy-start').onclick = async () => {
+      const goal = document.getElementById('autonomy-goal').value;
+      const interval = parseInt(document.getElementById('autonomy-interval').value || '120');
+      if (!goal) { alert('Enter a goal'); return; }
+      const r = await postJson('/admin/autonomy/start', {goal, interval});
+      document.getElementById('autonomy-status').textContent = JSON.stringify(r, null, 2);
+    };
+    document.getElementById('autonomy-stop').onclick = async () => {
+      const r = await postJson('/admin/autonomy/stop', {});
+      document.getElementById('autonomy-status').textContent = JSON.stringify(r, null, 2);
+    };
+
+    async function refreshAutonomyStatus(){
+      try{
+        const res = await fetch('/admin/autonomy/status');
+        const j = await res.json();
+        document.getElementById('autonomy-status').textContent = JSON.stringify(j, null, 2);
+      }catch(e){ document.getElementById('autonomy-status').textContent = 'error'; }
+    }
+
+    async function refreshAdminStatus(){
+      try{
+        const res = await fetch('/admin/status');
+        const j = await res.json();
+        const sdiv = document.getElementById('discover-queue-status');
+        sdiv.textContent = `Orch running: ${j.orchestrator_running} | schedules: ${j.schedules.length} | workers: ${j.worker_names.join(', ')} | discovery_q: ${j.discovery_queue_count} | review_q: ${j.review_queue_count}`;
+      }catch(e){ console.warn('status fetch failed', e); }
+    }
+
+    setInterval(refreshAdminStatus, 5000);
+    refreshAdminStatus();
+    document.getElementById('refresh-logs').onclick = async () => {
+      try{
+        const res = await fetch('/admin/logs');
+        const j = await res.json();
+        document.getElementById('logs').textContent = JSON.stringify(j, null, 2);
+        const rq = await fetch('/review/queue');
+        const rqj = await rq.json();
+        const qdiv = document.getElementById('review-queue');
+        qdiv.innerHTML = '';
+        (rqj.queue || []).forEach(it=>{
+          const el = document.createElement('div'); el.style.border='1px solid #eee'; el.style.padding='6px'; el.style.margin='4px';
+          el.textContent = JSON.stringify(it, null, 2);
+          qdiv.appendChild(el);
+        });
+      }catch(e){ console.warn('log refresh failed', e); }
+    };
+
+    document.getElementById('rebuild-index').onclick = async () => {
+      const r = await postJson('/admin/rebuild_index', {});
+      document.getElementById('rebuild-result').textContent = JSON.stringify(r);
+    };
+
+    document.getElementById('seed-discover').onclick = async () => {
+      const seeds = (document.getElementById('seed-input').value || 'Photosynthesis').split(',').map(s=>s.trim()).filter(Boolean);
+      const r = await postJson('/admin/discover', {seeds: seeds});
+      alert(JSON.stringify(r));
+    };
+
+    // refresh status periodically
+    setInterval(refreshAutonomyStatus, 5000);
+    refreshAutonomyStatus();
+  </script>
+</body>
+</html>

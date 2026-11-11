@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Orchestrator Schedules</title>
+  <style>body{font-family:Arial;padding:12px} .job{border:1px solid #ddd;padding:8px;margin-bottom:8px;border-radius:6px}</style>
+</head>
+<body>
+  <h2>Scheduled Jobs</h2>
+  <div id="list"></div>
+  <h3>Recent Runs</h3>
+  <div id="runs"></div>
+  <script>
+    async function fetchSchedules(){
+      const s = await fetch('/admin/schedule/list');
+      return await s.json();
+    }
+    async function fetchRuns(){
+      const r = await fetch('/admin/schedule/runs');
+      return await r.json();
+    }
+    function renderSchedules(data){
+      const div = document.getElementById('list'); div.innerHTML='';
+      (data.schedules||[]).forEach(s=>{ const d=document.createElement('div'); d.className='job'; d.innerHTML = `<strong>${s.name||s.schedule.name||s.schedule.name}</strong><div>agent: ${s.schedule.name}</div><div>interval: ${s.schedule.interval}</div>`; div.appendChild(d); });
+    }
+    function renderRuns(data){ const div=document.getElementById('runs'); div.innerHTML=''; (data.runs||[]).forEach(r=>{ const d=document.createElement('div'); d.className='job'; d.innerHTML=`<strong>${r.name}</strong><div>${r.run_time}</div><pre>${JSON.stringify(r.result||{}, null, 2).slice(0,1000)}</pre>`; div.appendChild(d); }); }
+    (async()=>{ renderSchedules(await fetchSchedules()); renderRuns(await fetchRuns()); })();
+  </script>
+</body>
+</html>

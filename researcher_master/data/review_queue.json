@@ -1,0 +1,68 @@
+[
+  {
+    "question": "What is retrieval-augmented generation?",
+    "timestamp": 1770893886.5444944,
+    "sources": []
+  },
+  {
+    "question": "What is reinforcement learning?",
+    "timestamp": 1771041105.899253,
+    "sources": []
+  },
+  {
+    "question": "What is reinforcement learning?",
+    "timestamp": 1771041810.3330095,
+    "sources": []
+  },
+  {
+    "question": "What is reinforcement learning?",
+    "timestamp": 1771041865.4676337,
+    "sources": []
+  },
+  {
+    "question": "tell me about life",
+    "timestamp": 1771046940.1239893,
+    "sources": []
+  },
+  {
+    "question": "What is reinforcement learning?",
+    "timestamp": 1771047623.0056593,
+    "sources": []
+  },
+  {
+    "question": "What is reinforcement learning?",
+    "timestamp": 1771047773.2180154,
+    "sources": []
+  },
+  {
+    "question": "What is reinforcement learning?",
+    "timestamp": 1771048289.6615608,
+    "sources": []
+  },
+  {
+    "question": "What is reinforcement learning?",
+    "timestamp": 1771048631.330113,
+    "sources": [
+      {
+        "rank": 1,
+        "score": 0.0,
+        "doc_id": "Sample Doc__chunk_0",
+        "meta": {
+          "source": "local",
+          "title": "Sample Doc",
+          "doc_id": "sample1",
+          "chunk_index": 0
+        },
+        "source": "local",
+        "title": "Sample Doc",
+        "url": null,
+        "text": "Water boils at 100 degrees Celsius at sea level. Photosynthesis converts sunlight into chemical energy."
+      }
+    ]
+  },
+  {
+    "question": "what is sun tell me all the human know about sun",
+    "timestamp": 1771051734.8423214,
+    "sources": []
+  }
+]

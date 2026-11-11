@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Researcher Master - Chat</title>
+  <style>
+    body{font-family: Arial, sans-serif; margin:20px}
+    #chat { border:1px solid #ddd; height:400px; overflow:auto; padding:8px; background:#fafafa }
+    .msg { margin:6px 0 }
+    .user{ color: #0b63d6 }
+    .bot{ color: #2d862d }
+    textarea{ width:100%; height:80px }
+    button{ margin-right:8px }
+  </style>
+</head>
+<body>
+  <h1>Agent Chat</h1>
+  <div id="chat"></div>
+  <div style="margin-top:8px">
+    <textarea id="prompt" placeholder="Ask the Master agent or give a goal..."></textarea>
+  </div>
+  <div style="margin-top:8px">
+    <button id="send">Send (generate)</button>
+    <button id="run-goal">Run as Goal (plan & execute)</button>
+    <label style="margin-left:12px">Top K: <input id="topk" value="5" style="width:60px"/></label>
+    <label style="margin-left:12px">Use RAG: <input id="use_rag" type="checkbox"/></label>
+  </div>
+
+  <script>
+    function addMessage(text, cls){
+      const d = document.createElement('div'); d.className = 'msg '+cls; d.textContent = text;
+      document.getElementById('chat').appendChild(d);
+      document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+    }
+
+    async function postJson(url, body){
+      const res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+      return res.json().catch(()=>({}));
+    }
+
+    document.getElementById('send').onclick = async () =>{
+      const prompt = document.getElementById('prompt').value;
+      if(!prompt) return;
+      addMessage('You: '+prompt, 'user');
+      const topk = parseInt(document.getElementById('topk').value||'5');
+      const use_rag = document.getElementById('use_rag').checked === true;
+      addMessage('Thinking...', 'bot');
+      const res = await postJson('/api/agent/generate', {prompt, top_k: topk, use_rag});
+      // best-effort display
+      let out = '';
+      if(typeof res === 'string') out = res;
+      else if(res && res.output) out = res.output || JSON.stringify(res);
+      else out = JSON.stringify(res, null, 2);
+      // remove the 'Thinking...' message and display output
+      const chat = document.getElementById('chat');
+      const nodes = chat.querySelectorAll('.msg.bot');
+      const botNode = (nodes.length) ? nodes[nodes.length-1] : null;
+      const displayText = 'Master: ' + out;
+      if(botNode) botNode.textContent = displayText; else addMessage(displayText, 'bot');
+
+      // display RAG sources if present
+      if(res && res.rag && res.rag.sources){
+        const sources = res.rag.sources;
+        const div = document.createElement('div');
+        div.className = 'msg bot';
+        const h = document.createElement('div'); h.style.fontWeight='bold'; h.textContent = 'Sources:';
+        div.appendChild(h);
+        sources.slice(0,5).forEach(s => {
+          const p = document.createElement('div');
+          p.style.marginLeft = '12px';
+          p.textContent = (s.rank ? '['+s.rank+'] ' : '') + (s.meta && s.meta.title ? s.meta.title : (s.doc_id || '')) + ' — ' + (s.text ? s.text.slice(0,200) : '');
+          div.appendChild(p);
+        });
+        document.getElementById('chat').appendChild(div);
+      }
+    };
+
+    document.getElementById('run-goal').onclick = async () =>{
+      const goal = document.getElementById('prompt').value;
+      if(!goal) return;
+      addMessage('You (goal): '+goal, 'user');
+      addMessage('Planner running...', 'bot');
+      const res = await postJson('/api/agent/run_goal', {goal, max_steps: 8});
+      const out = JSON.stringify(res, null, 2);
+      const chat = document.getElementById('chat');
+      const nodes = chat.querySelectorAll('.msg.bot');
+      if(nodes.length) nodes[nodes.length-1].textContent = 'Master (run_goal): ' + out;
+      else addMessage('Master (run_goal): '+out, 'bot');
+    };
+  </script>
+</body>
+</html>

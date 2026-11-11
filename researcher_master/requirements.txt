@@ -1,0 +1,23 @@
+fastapi>=0.95.0
+uvicorn[standard]>=0.22.0
+python-dotenv>=1.0.0
+requests>=2.28.0
+rank_bm25>=0.2.2
+pytest>=7.0.0
+httpx>=0.27.0
+duckduckgo-search>=6.0.0
+ddgs>=9.0.0
+
+# Optional (heavy): full RAG with vector search + local embeddings
+# pip install sentence-transformers faiss-cpu spacy networkx && python -m spacy download en_core_web_sm
+# sentence-transformers>=2.2.2
+# faiss-cpu>=1.7.3
+# spacy>=3.5.0
+# networkx>=3.1
+
+# Optional: local transformers LLM
+# transformers>=4.40.0
+# torch>=2.0.0
+
+# Optional remote APIs
+# openai>=1.0.0

@@ -1,0 +1,46 @@
+# secrets & credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.keystore
+*.p12
+secrets.*
+serviceAccount*.json
+# databases & data caches
+*.db
+*.sqlite
+*.sqlite3
+# archives & media dumps
+*.zip
+# dependencies / build output
+node_modules/
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+dist/
+build/
+.next/
+.expo/
+.gradle/
+.dart_tool/
+# editor / OS
+.idea/
+.vscode/
+.continue/
+__MACOSX/
+.DS_Store
+Thumbs.db
+*.log
+
+# AI-tool files (never push)
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+.mcp.json

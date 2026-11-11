@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Review Queue</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .item { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    button { margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>Review Queue</h1>
+  <div id="queue"></div>
+  <script>
+    async function loadQueue() {
+      const res = await fetch('/review/queue');
+      const data = await res.json();
+      const q = (data && data.queue) || [];
+      const container = document.getElementById('queue');
+      container.innerHTML = '';
+      if (!q.length) {
+        container.innerHTML = '<p>No items to review.</p>';
+        return;
+      }
+      q.forEach((it) => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        const inner = it.item || it;
+        const question = document.createElement('div');
+        question.innerHTML = '<strong>Item (idx ' + it.idx + '):</strong> ' + (inner.question || inner.reason || JSON.stringify(inner).slice(0, 200));
+        const time = document.createElement('div');
+        const d = new Date((inner.timestamp || 0) * 1000);
+        time.innerHTML = '<em>' + (inner.timestamp ? d.toLocaleString() : '') + '</em>';
+        const sources = document.createElement('pre');
+        sources.textContent = JSON.stringify(inner.sources || inner, null, 2).slice(0, 800);
+        const btn = document.createElement('button');
+        btn.textContent = 'Mark Reviewed';
+        btn.onclick = async () => {
+          await fetch('/review/mark', {method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({index: it.idx})});
+          loadQueue();
+        };
+        div.appendChild(question);
+        div.appendChild(time);
+        div.appendChild(sources);
+        div.appendChild(btn);
+        container.appendChild(div);
+      });
+    }
+    loadQueue();
+  </script>
+</body>
+</html>

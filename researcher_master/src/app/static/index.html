@@ -1,0 +1,525 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Researcher-Master - Agentic AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f2ea;
+      --surface: #fffdf7;
+      --border: #d6cfbe;
+      --text: #1f2a30;
+      --muted: #5f6b6f;
+      --accent: #0f766e;
+      --success: #2f9e44;
+      --warning: #b7791f;
+    }
+    * { box-sizing: border-box; }
+    body { font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif; margin: 0; color: var(--text); min-height: 100vh; background: radial-gradient(circle at 20% 10%, #fffef9, #f4f2ea 42%, #ece6d6 100%); }
+    .top {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,253,247,0.92);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .top h1 { margin: 0; font-size: 1.2rem; letter-spacing: 0.2px; }
+    .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+    .tabs a {
+      padding: 8px 14px; border-radius: 6px; color: var(--muted); text-decoration: none; font-weight: 500;
+    }
+    .tabs a:hover { color: var(--text); background: rgba(15,118,110,0.12); }
+    .tabs a.active { color: var(--accent); background: rgba(15,118,110,0.16); }
+    main { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .panel {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 8px 20px rgba(31, 42, 48, 0.06); animation: fadeUp 280ms ease-out;
+    }
+    .panel h2 { margin: 0 0 12px 0; font-size: 1.1rem; color: var(--accent); }
+    button, .btn {
+      background: var(--accent); color: #fff; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px;
+    }
+    button:hover, .btn:hover { opacity: 0.9; }
+    button.secondary { background: var(--border); }
+    button.danger { background: #da3633; }
+    input, textarea, select {
+      background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; width: 100%; max-width: 400px;
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    label { display: block; margin-bottom: 4px; color: var(--muted); font-size: 13px; }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+    .out { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; margin-top: 10px; max-height: 360px; overflow: auto; font-size: 13px; white-space: pre-wrap; word-break: break-word; }
+    .out.empty { color: var(--muted); }
+    .section { display: none; }
+    .section.active { display: block; }
+    .msg { margin: 6px 0; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .msg.user { color: #79c0ff; }
+    .msg.bot { color: var(--success); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; background: var(--border); color: var(--muted); }
+    .badge.ok { background: rgba(63,185,80,0.2); color: var(--success); }
+    .item { border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+    .item h4 { margin: 0 0 6px 0; font-size: 14px; }
+    .status-line { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <h1>Researcher-Master â€” Agentic AI</h1>
+    <nav class="tabs">
+      <a href="#chat" class="tab active">Chat & Ask</a>
+      <a href="#activity" class="tab">Agent activity</a>
+      <a href="#discover" class="tab">Discover & Crawl</a>
+      <a href="#kg" class="tab">Knowledge Graph</a>
+      <a href="#review" class="tab">Review Queue</a>
+      <a href="#pipeline" class="tab">Pipeline</a>
+      <a href="#autonomy" class="tab">Autonomy</a>
+      <a href="#tutor" class="tab">Tutor & Mastery</a>
+      <a href="#system" class="tab">System</a>
+    </nav>
+    <div style="margin-left:auto; font-size:13px; color: var(--muted);">
+      <a href="/static/chat.html" target="_blank" style="color:var(--accent); margin-right:10px">Chat</a>
+      <a href="/static/dashboard.html" target="_blank" style="color:var(--accent); margin-right:10px">Dashboard</a>
+      <a href="/static/discover.html" target="_blank" style="color:var(--accent); margin-right:10px">Discover</a>
+      <a href="/static/kg_d3.html" target="_blank" style="color:var(--accent); margin-right:10px">KG</a>
+      <a href="/static/review.html" target="_blank" style="color:var(--accent)">Review</a>
+    </div>
+  </div>
+  <main>
+    <!-- Chat & Ask -->
+    <section id="section-chat" class="section active">
+      <div class="panel">
+        <h2>Ask (RAG + Local LLM)</h2>
+        <p class="status-line">Answer from stored knowledge using local LLM (Ollama/transformers) or OpenAI.</p>
+        <div class="row">
+          <textarea id="chat-question" placeholder="Ask anything... e.g. What is reinforcement learning?"></textarea>
+        </div>
+        <div class="row">
+          <button id="btn-ask">Ask</button>
+          <button id="btn-ask-learn">Ask or Learn (fetch if unknown)</button>
+          <label style="display:inline; margin-left:12px">Top K <input id="chat-topk" type="number" value="5" style="width:60px; display:inline" /></label>
+        </div>
+        <div id="chat-answer" class="out empty">Answer and sources appear here.</div>
+      </div>
+      <div class="panel">
+        <h2>Generate & Run Goal</h2>
+        <div class="row">
+          <textarea id="goal-prompt" placeholder="Prompt or goal... e.g. Learn about photosynthesis"></textarea>
+        </div>
+        <div class="row">
+          <button id="btn-generate">Generate (LLM)</button>
+          <label style="display:inline"><input id="use-rag" type="checkbox" /> Use RAG</label>
+          <button id="btn-run-goal">Run as Goal (plan & execute)</button>
+        </div>
+        <div id="goal-out" class="out empty">Result here.</div>
+      </div>
+      <div id="chat-log" class="panel" style="max-height:400px; overflow:auto"></div>
+    </section>
+
+    <!-- Agent activity (live) -->
+    <section id="section-activity" class="section">
+      <div class="panel">
+        <h2>Agent activity â€” what the AI is doing</h2>
+        <p class="status-line">Crawling, learning, ingesting, verifying. Auto-refreshes every 2s.</p>
+        <button id="btn-activity-refresh">Refresh now</button>
+        <div id="activity-feed" class="out" style="max-height:420px; font-family:monospace; font-size:12px;"></div>
+      </div>
+    </section>
+
+    <!-- Discover & Crawl -->
+    <section id="section-discover" class="section">
+      <div class="panel">
+        <h2>Search & Crawl Knowledge</h2>
+        <p class="status-line">Fetch from Wikipedia and optional search engine (SerpAPI/DuckDuckGo). Seeds are used as Wikipedia titles or search queries.</p>
+        <div class="row">
+          <input id="discover-seeds" placeholder="e.g. Photosynthesis, Machine learning, Water cycle" style="max-width:500px" />
+          <button id="btn-discover">Discover & enqueue</button>
+        </div>
+        <div id="discover-result" class="out empty">Discovery result and queue count.</div>
+      </div>
+      <div class="panel">
+        <h2>Discovery Queue â€” Accept to ingest</h2>
+        <button id="btn-refresh-queue">Refresh</button>
+        <button id="btn-accept-all" class="secondary">Accept all (ingest all in queue)</button>
+        <div id="discover-queue" class="out empty">Queue items with Accept/Reject.</div>
+      </div>
+    </section>
+
+    <!-- KG -->
+    <section id="section-kg" class="section">
+      <div class="panel">
+        <h2>Knowledge Graph</h2>
+        <p><a href="/static/kg_d3.html" target="_blank">Open full KG visualizer (D3)</a></p>
+        <button id="btn-load-kg">Load KG summary</button>
+        <div id="kg-out" class="out empty">Nodes and edges summary.</div>
+      </div>
+    </section>
+
+    <!-- Review -->
+    <section id="section-review" class="section">
+      <div class="panel">
+        <h2>Review Queue</h2>
+        <button id="btn-refresh-review">Refresh</button>
+        <div id="review-queue" class="out empty">Low-confidence items to review.</div>
+      </div>
+    </section>
+
+    <!-- Pipeline -->
+    <section id="section-pipeline" class="section">
+      <div class="panel">
+        <h2>Pipeline & Index</h2>
+        <p class="status-line">Run full ingest â†’ KG â†’ mapping, or rebuild index / retriever.</p>
+        <div class="row">
+          <button id="btn-run-pipeline">Run full pipeline</button>
+          <button id="btn-rebuild-index">Rebuild index</button>
+          <button id="btn-build-retriever">Build retriever (bootstrap)</button>
+        </div>
+        <div id="pipeline-out" class="out empty">Status.</div>
+      </div>
+    </section>
+
+    <!-- Autonomy -->
+    <section id="section-autonomy" class="section">
+      <div class="panel">
+        <h2>Autonomy & Workers</h2>
+        <div class="row">
+          <input id="autonomy-goal" placeholder="Goal e.g. Master photosynthesis" style="max-width:300px" />
+          <input id="autonomy-interval" type="number" value="120" style="width:80px" />
+          <button id="btn-autonomy-start">Start autonomy</button>
+          <button id="btn-autonomy-stop" class="danger">Stop</button>
+        </div>
+        <div class="row">
+          <button id="btn-orch-start">Start orchestrator</button>
+          <button id="btn-orch-stop" class="secondary">Stop orchestrator</button>
+          <button id="btn-worker-start">Start discovery worker</button>
+          <button id="btn-worker-stop" class="secondary">Stop worker</button>
+        </div>
+        <div id="admin-status" class="status-line"></div>
+        <div id="autonomy-status" class="out empty"></div>
+      </div>
+    </section>
+
+    <!-- Tutor & Mastery -->
+    <section id="section-tutor" class="section">
+      <div class="panel">
+        <h2>Tutor â€” Lesson</h2>
+        <div class="row">
+          <input id="tutor-topic" placeholder="Topic e.g. Photosynthesis" style="max-width:300px" />
+          <select id="tutor-level"><option value="intro">Intro</option><option value="advanced">Advanced</option></select>
+          <button id="btn-tutor">Get lesson</button>
+        </div>
+        <div id="tutor-out" class="out empty"></div>
+      </div>
+      <div class="panel">
+        <h2>Mastery report</h2>
+        <div class="row">
+          <input id="mastery-topic" placeholder="Topic" style="max-width:300px" />
+          <button id="btn-mastery">Generate report</button>
+        </div>
+        <div id="mastery-out" class="out empty"></div>
+      </div>
+    </section>
+
+    <!-- System -->
+    <section id="section-system" class="section">
+      <div class="panel">
+        <h2>System & Health</h2>
+        <button id="btn-health">Health</button>
+        <button id="btn-system">System info (LLM, retriever, DB)</button>
+        <button id="btn-llm-check">LLM check</button>
+        <div class="row" style="margin-top:10px">
+          <input id="deep-topic" placeholder="Deep learn topic (e.g. reinforcement learning)" style="max-width:420px" />
+          <button id="btn-deep-learn">Deep Learn + Build KG</button>
+        </div>
+        <div id="system-out" class="out empty"></div>
+      </div>
+      <div class="panel">
+        <h2>Sandbox (run Python)</h2>
+        <p class="status-line">Run a small Python snippet (local only, timeout 10s).</p>
+        <textarea id="sandbox-code" placeholder="print(2+2)" style="min-height:60px; max-width:100%"></textarea>
+        <div class="row"><button id="btn-sandbox">Run</button></div>
+        <div id="sandbox-out" class="out empty"></div>
+      </div>
+      <div class="panel">
+        <h2>Admin queues & logs</h2>
+        <button id="btn-queues">Queues</button>
+        <button id="btn-logs">Logs</button>
+        <div id="admin-out" class="out empty"></div>
+      </div>
+      <div class="panel">
+        <h2>Memory</h2>
+        <p class="status-line">Store and query long-term agent memory.</p>
+        <div class="row">
+          <input id="memory-query" placeholder="search memory..." style="max-width:300px" />
+          <button id="btn-memory-query">Query</button>
+          <button id="btn-memory-list" class="secondary">List</button>
+        </div>
+        <div class="row">
+          <textarea id="memory-payload" placeholder='{"note":"facts about photosynthesis"}' style="min-height:60px; max-width:100%"></textarea>
+          <button id="btn-memory-add">Add memory</button>
+        </div>
+        <div id="memory-out" class="out empty"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const API = (path, opts = {}) => fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts }).then(r => r.json().catch(() => ({})));
+    const post = (path, body) => API(path, { method: 'POST', body: JSON.stringify(body) });
+    const get = (path) => API(path, { method: 'GET' });
+
+    function setOut(id, text, isEmpty) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = typeof text === 'string' ? text : JSON.stringify(text, null, 2);
+      el.classList.toggle('empty', isEmpty);
+    }
+
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      const section = document.getElementById('section-' + id);
+      const tab = document.querySelector('.tab[href="#' + id + '"]');
+      if (section) section.classList.add('active');
+      if (tab) tab.classList.add('active');
+      if (id === 'activity') refreshActivity();
+    }
+    document.querySelectorAll('.tab').forEach(a => {
+      a.onclick = (e) => { e.preventDefault(); const h = a.getAttribute('href'); if (h && h.startsWith('#')) showSection(h.slice(1)); }
+    });
+    if (location.hash) showSection(location.hash.slice(1));
+
+    // â€”â€” Chat & Ask â€”â€”
+    document.getElementById('btn-ask').onclick = async () => {
+      const q = document.getElementById('chat-question').value.trim();
+      if (!q) return;
+      setOut('chat-answer', '...', false);
+      const res = await post('/ask', { question: q, top_k: parseInt(document.getElementById('chat-topk').value) || 5 });
+      let t = (res.answer || res.detail || JSON.stringify(res)) + '\n\nSources: ' + (res.sources && res.sources.length ? res.sources.length : 0);
+      if (res.sources && res.sources.length) res.sources.forEach((s, i) => { t += '\n[' + (i+1) + '] ' + (s.text || '').slice(0, 150); });
+      setOut('chat-answer', t, false);
+    };
+    document.getElementById('btn-ask-learn').onclick = async () => {
+      const q = document.getElementById('chat-question').value.trim();
+      if (!q) return;
+      setOut('chat-answer', 'Learning if needed...', false);
+      const res = await post('/ask_or_learn', { question: q, learn_if_unknown: true, top_k: 5 });
+      let t = (res.answer || '') + '\n\nLearned: ' + (res.learned ? 'yes' : 'no') + '\nSources: ' + (res.sources && res.sources.length || 0);
+      if (res.sources && res.sources.length) res.sources.forEach((s, i) => { t += '\n[' + (i+1) + '] ' + (s.text || '').slice(0, 150); });
+      setOut('chat-answer', t, false);
+    };
+
+    document.getElementById('btn-generate').onclick = async () => {
+      const prompt = document.getElementById('goal-prompt').value.trim();
+      if (!prompt) return;
+      setOut('goal-out', '...', false);
+      const res = await post('/api/agent/generate', { prompt, top_k: document.getElementById('use-rag').checked ? 5 : 0, use_rag: document.getElementById('use-rag').checked });
+      setOut('goal-out', res.output || res.detail || JSON.stringify(res), false);
+    };
+    document.getElementById('btn-run-goal').onclick = async () => {
+      const goal = document.getElementById('goal-prompt').value.trim();
+      if (!goal) return;
+      setOut('goal-out', 'Running plan...', false);
+      const res = await post('/api/agent/run_goal', { goal, max_steps: 6 });
+      setOut('goal-out', res.summary || res.detail || JSON.stringify(res), false);
+    };
+
+    // â€”â€” Discover â€”â€”
+    document.getElementById('btn-discover').onclick = async () => {
+      const seeds = document.getElementById('discover-seeds').value.split(',').map(s => s.trim()).filter(Boolean);
+      if (!seeds.length) { setOut('discover-result', 'Enter comma-separated seeds.', false); return; }
+      setOut('discover-result', 'Discovering...', false);
+      const res = await post('/admin/discover', { seeds });
+      setOut('discover-result', 'Found: ' + (res.found && res.found.length) + ', queue count: ' + (res.queue_count || 0) + '\n' + JSON.stringify(res, null, 2), false);
+      document.getElementById('btn-refresh-queue').click();
+    };
+    async function refreshDiscoverQueue() {
+      const res = await get('/admin/discover/queue');
+      const queue = res.queue || [];
+      const div = document.getElementById('discover-queue');
+      div.innerHTML = '';
+      div.classList.toggle('empty', !queue.length);
+      if (!queue.length) { div.textContent = 'Queue empty.'; return; }
+      queue.forEach(item => {
+        const i = item.item || item;
+        const box = document.createElement('div');
+        box.className = 'item';
+        box.innerHTML = '<h4>' + (i.title || i.url || item.id) + '</h4><div>' + (i.snippet || i.text || '').slice(0, 300) + '</div>';
+        const accept = document.createElement('button');
+        accept.textContent = 'Accept (ingest)';
+        accept.onclick = async () => {
+          await post('/admin/discover/accept', { id: item.id });
+          refreshDiscoverQueue();
+        };
+        const reject = document.createElement('button');
+        reject.textContent = 'Reject';
+        reject.className = 'secondary';
+        reject.onclick = async () => {
+          await post('/admin/discover/reject', { id: item.id });
+          refreshDiscoverQueue();
+        };
+        box.appendChild(accept);
+        box.appendChild(reject);
+        div.appendChild(box);
+      });
+    }
+    document.getElementById('btn-refresh-queue').onclick = refreshDiscoverQueue;
+    document.getElementById('btn-accept-all').onclick = async () => {
+      const res = await get('/admin/discover/queue');
+      const q = res.queue || [];
+      for (const item of q) {
+        try { await post('/admin/discover/accept', { id: item.id }); } catch (e) {}
+      }
+      refreshDiscoverQueue();
+      setOut('discover-result', 'Accepted and ingested ' + q.length + ' items.', false);
+    };
+
+    // â€”â€” Agent activity â€”â€”
+    async function refreshActivity() {
+      try {
+        const r = await get('/admin/activity?limit=80');
+        const events = r.events || [];
+        const el = document.getElementById('activity-feed');
+        if (!el) return;
+        if (!events.length) { el.innerHTML = '<span class="empty">No activity yet. Use Ask or Learn, Discover, or run Pipeline.</span>'; return; }
+        el.innerHTML = events.map(e => {
+          const t = new Date((e.ts || 0) * 1000).toLocaleTimeString();
+          const d = e.detail && Object.keys(e.detail).length ? ' ' + JSON.stringify(e.detail) : '';
+          return '<div class="msg">[' + t + '] <strong>' + (e.agent || '') + '</strong>: ' + (e.message || '') + d + '</div>';
+        }).join('');
+        el.scrollTop = el.scrollHeight;
+      } catch (e) {}
+    }
+    document.getElementById('btn-activity-refresh').onclick = refreshActivity;
+    setInterval(refreshActivity, 2000);
+
+    // â€”â€” KG â€”â€”
+    document.getElementById('btn-load-kg').onclick = async () => {
+      try {
+        const kg = await get('/kg');
+        setOut('kg-out', 'Nodes: ' + (kg.nodes && kg.nodes.length) + ', Edges: ' + (kg.edges && kg.edges.length) + '\n' + JSON.stringify(kg, null, 2), false);
+      } catch (e) {
+        setOut('kg-out', 'Error: ' + e.message + ' (Build KG from Pipeline first)', false);
+      }
+    };
+
+    // â€”â€” Review â€”â€”
+    async function refreshReview() {
+      const res = await get('/review/queue');
+      const queue = (res.queue || []);
+      const div = document.getElementById('review-queue');
+      div.innerHTML = '';
+      div.classList.toggle('empty', !queue.length);
+      if (!queue.length) { div.textContent = 'No items.'; return; }
+      queue.forEach((it, idx) => {
+        const box = document.createElement('div');
+        box.className = 'item';
+        const inner = it.item || it;
+        box.innerHTML = '<h4>Item ' + (idx + 1) + '</h4><pre>' + JSON.stringify(inner, null, 2).slice(0, 500) + '</pre>';
+        const btn = document.createElement('button');
+        btn.textContent = 'Mark reviewed';
+        btn.onclick = async () => {
+          await post('/review/mark', { index: it.idx !== undefined ? it.idx : idx });
+          refreshReview();
+        };
+        box.appendChild(btn);
+        div.appendChild(box);
+      });
+    }
+    document.getElementById('btn-refresh-review').onclick = refreshReview;
+
+    // â€”â€” Pipeline â€”â€”
+    document.getElementById('btn-run-pipeline').onclick = async () => { setOut('pipeline-out', await post('/admin/run_pipeline'), false); };
+    document.getElementById('btn-rebuild-index').onclick = async () => { setOut('pipeline-out', await post('/admin/rebuild_index'), false); };
+    document.getElementById('btn-build-retriever').onclick = async () => { setOut('pipeline-out', await post('/admin/retriever/build'), false); };
+
+    // â€”â€” Autonomy â€”â€”
+    document.getElementById('btn-autonomy-start').onclick = async () => {
+      const goal = document.getElementById('autonomy-goal').value.trim();
+      const interval = parseInt(document.getElementById('autonomy-interval').value) || 120;
+      if (!goal) return;
+      const r = await post('/admin/autonomy/start', { goal, interval });
+      setOut('autonomy-status', r, false);
+      refreshAdminStatus();
+    };
+    document.getElementById('btn-autonomy-stop').onclick = async () => { setOut('autonomy-status', await post('/admin/autonomy/stop'), false); };
+    document.getElementById('btn-orch-start').onclick = async () => { await post('/admin/orchestrator/start'); refreshAdminStatus(); };
+    document.getElementById('btn-orch-stop').onclick = async () => { await post('/admin/orchestrator/stop'); refreshAdminStatus(); };
+    document.getElementById('btn-worker-start').onclick = async () => { await post('/admin/worker/start', { name: 'discovery_worker', interval: 5 }); refreshAdminStatus(); };
+    document.getElementById('btn-worker-stop').onclick = async () => { await post('/admin/worker/stop', { name: 'discovery_worker' }); refreshAdminStatus(); };
+    async function refreshAdminStatus() {
+      try {
+        const j = await get('/admin/status');
+        const s = await get('/admin/autonomy/status');
+        document.getElementById('admin-status').textContent = 'Orch: ' + j.orchestrator_running + ' | Workers: ' + (j.worker_names && j.worker_names.join(', ') || '') + ' | Discovery Q: ' + (j.discovery_queue_count || 0) + ' | Review Q: ' + (j.review_queue_count || 0) + ' | Autonomy: ' + (s.running ? 'on' : 'off');
+      } catch (e) {}
+    }
+    setInterval(refreshAdminStatus, 6000);
+    refreshAdminStatus();
+
+    // â€”â€” Tutor & Mastery â€”â€”
+    document.getElementById('btn-tutor').onclick = async () => {
+      const topic = document.getElementById('tutor-topic').value.trim() || 'General';
+      const level = document.getElementById('tutor-level').value;
+      const r = await post('/tutor/lesson', { topic, level });
+      setOut('tutor-out', r, false);
+    };
+    document.getElementById('btn-mastery').onclick = async () => {
+      const topic = document.getElementById('mastery-topic').value.trim() || 'General';
+      const r = await post('/synthesis/mastery', { topic });
+      setOut('mastery-out', r, false);
+    };
+
+    // â€”â€” System â€”â€”
+    document.getElementById('btn-health').onclick = async () => { setOut('system-out', await get('/health'), false); };
+    document.getElementById('btn-system').onclick = async () => { setOut('system-out', await get('/admin/system'), false); };
+    document.getElementById('btn-llm-check').onclick = async () => {
+      setOut('system-out', 'Checking local LLM...', false);
+      const r = await post('/admin/llm/check', { prompt: 'Reply with: Local LLM is working.' });
+      setOut('system-out', r, false);
+    };
+    document.getElementById('btn-deep-learn').onclick = async () => {
+      const topic = document.getElementById('deep-topic').value.trim();
+      if (!topic) { setOut('system-out', 'Enter a topic for deep learning.', false); return; }
+      setOut('system-out', 'Running deep learning cycle (discover + ingest + KG)...', false);
+      const r = await post('/admin/learn/deep', { topic, max_queries: 5, max_learn_sources: 30, build_kg: true });
+      setOut('system-out', r, false);
+      try { refreshAdminStatus(); } catch (e) {}
+    };
+    document.getElementById('btn-sandbox').onclick = async () => {
+      const code = document.getElementById('sandbox-code').value.trim() || 'print(2+2)';
+      const r = await post('/sandbox/run', { code, timeout: 10 });
+      setOut('sandbox-out', 'returncode: ' + r.returncode + '\nstdout: ' + (r.stdout || '') + '\nstderr: ' + (r.stderr || ''), false);
+    };
+    document.getElementById('btn-queues').onclick = async () => { setOut('admin-out', await get('/admin/queues'), false); };
+    document.getElementById('btn-logs').onclick = async () => { setOut('admin-out', await get('/admin/logs'), false); };
+    document.getElementById('btn-memory-list').onclick = async () => {
+      setOut('memory-out', await get('/admin/memory/list?limit=100'), false);
+    };
+    document.getElementById('btn-memory-query').onclick = async () => {
+      const q = document.getElementById('memory-query').value.trim();
+      if (!q) return;
+      setOut('memory-out', await get('/admin/memory/query?q=' + encodeURIComponent(q) + '&top_k=5'), false);
+    };
+    document.getElementById('btn-memory-add').onclick = async () => {
+      const raw = document.getElementById('memory-payload').value.trim();
+      if (!raw) return;
+      let payload;
+      try { payload = JSON.parse(raw); } catch (e) { setOut('memory-out', 'Invalid JSON payload', false); return; }
+      const r = await post('/admin/memory/add', { payload });
+      setOut('memory-out', r, false);
+    };
+  </script>
+</body>
+</html>
+
+
